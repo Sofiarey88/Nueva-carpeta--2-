@@ -22,15 +22,18 @@ const emptyForm: FormState = {
 
 type AdminClientProps = {
   initialProducts: Product[];
+  role?: 'admin' | 'employee';
 };
 
-export default function AdminClient({ initialProducts }: AdminClientProps) {
+export default function AdminClient({ initialProducts, role = 'admin' }: AdminClientProps) {
   const router = useRouter();
   const [products, setProducts] = useState<Product[]>(initialProducts);
   const [form, setForm] = useState<FormState>(emptyForm);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState<string | null>(null);
+  
+  const isAdmin = role === 'admin';
 
   const formModeLabel = useMemo(() => (editingId ? "Actualizar" : "Crear"), [editingId]);
 
@@ -103,9 +106,17 @@ export default function AdminClient({ initialProducts }: AdminClientProps) {
       <div className="mx-auto flex max-w-5xl flex-col gap-8 px-6 py-12">
         <header className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
           <div className="space-y-1">
-            <p className="text-xs uppercase tracking-[0.3em] text-slate-400">Admin</p>
-            <h1 className="text-3xl font-semibold">Panel de productos</h1>
-            <p className="text-sm text-slate-400">Acceso protegido por clave de administrador.</p>
+            <p className={`text-xs uppercase tracking-[0.3em] ${isAdmin ? 'text-amber-300/80' : 'text-blue-400/80'}`}>
+              {isAdmin ? 'Admin' : 'Empleado'}
+            </p>
+            <h1 className="text-3xl font-semibold">
+              {isAdmin ? 'Panel de productos' : 'Vista de inventario'}
+            </h1>
+            <p className="text-sm text-slate-400">
+              {isAdmin
+                ? 'Acceso protegido por clave de administrador.'
+                : 'Acceso de solo lectura.'}
+            </p>
           </div>
           <button
             onClick={handleLogout}
@@ -116,23 +127,24 @@ export default function AdminClient({ initialProducts }: AdminClientProps) {
         </header>
 
         <section className="grid grid-cols-1 gap-6 md:grid-cols-2">
-          <div className="rounded-2xl border border-white/5 bg-white/5 p-6 shadow-xl backdrop-blur">
-            <div className="mb-4 flex items-center justify-between">
-              <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-amber-300/80">{formModeLabel}</p>
-                <h2 className="text-xl font-semibold">Producto</h2>
+          {isAdmin && (
+            <div className="rounded-2xl border border-white/5 bg-white/5 p-6 shadow-xl backdrop-blur">
+              <div className="mb-4 flex items-center justify-between">
+                <div>
+                  <p className="text-xs uppercase tracking-[0.3em] text-amber-300/80">{formModeLabel}</p>
+                  <h2 className="text-xl font-semibold">Producto</h2>
+                </div>
+                {editingId && (
+                  <button
+                    onClick={resetForm}
+                    className="text-sm text-slate-300 transition hover:text-white"
+                  >
+                    Cancelar edición
+                  </button>
+                )}
               </div>
-              {editingId && (
-                <button
-                  onClick={resetForm}
-                  className="text-sm text-slate-300 transition hover:text-white"
-                >
-                  Cancelar edición
-                </button>
-              )}
-            </div>
 
-            <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
+              <form className="flex flex-col gap-4" onSubmit={handleSubmit}>
               <div className="space-y-2">
                 <label className="text-sm text-slate-200">Nombre</label>
                 <input
@@ -195,12 +207,13 @@ export default function AdminClient({ initialProducts }: AdminClientProps) {
                 {loading ? "Guardando..." : `${formModeLabel} producto`}
               </button>
             </form>
-          </div>
+            </div>
+          )}
 
-          <div className="rounded-2xl border border-white/5 bg-white/5 p-6 shadow-xl backdrop-blur">
+          <div className={`rounded-2xl border border-white/5 bg-white/5 p-6 shadow-xl backdrop-blur ${!isAdmin ? 'md:col-span-1' : ''}`}>
             <div className="mb-4 flex items-center justify-between">
               <div>
-                <p className="text-xs uppercase tracking-[0.3em] text-amber-300/80">Inventario</p>
+                <p className={`text-xs uppercase tracking-[0.3em] ${isAdmin ? 'text-amber-300/80' : 'text-blue-300/80'}`}>Inventario</p>
                 <h2 className="text-xl font-semibold">Productos ({products.length})</h2>
               </div>
               <button
@@ -216,27 +229,29 @@ export default function AdminClient({ initialProducts }: AdminClientProps) {
                   key={product.id}
                   className="flex flex-col gap-2 rounded-xl border border-white/10 bg-slate-900/60 p-4 md:flex-row md:items-center md:justify-between"
                 >
-                  <div className="space-y-1">
+                  <div className="space-y-1 flex-1">
                     <p className="text-sm uppercase tracking-[0.2em] text-slate-400">{product.id}</p>
                     <h3 className="text-lg font-semibold">{product.name}</h3>
                     <p className="text-sm text-slate-300">{product.description}</p>
-                    <div className="flex gap-3 text-sm text-amber-200">
+                    <div className={`flex gap-3 text-sm ${isAdmin ? 'text-amber-200' : 'text-blue-200'}`}>
                       <span>${product.price.toFixed(2)}</span>
                       <span>Stock: {product.stock}</span>
                     </div>
                   </div>
-                  <div className="flex gap-2">
-                    <button
-                      onClick={() => startEdit(product)}
-                      className="rounded-full border border-amber-300/60 px-3 py-1 text-sm text-amber-200 transition hover:bg-amber-300 hover:text-slate-900"
-                    >
-                      Editar
-                    </button>
-                  </div>
+                  {isAdmin && (
+                    <div className="flex gap-2">
+                      <button
+                        onClick={() => startEdit(product)}
+                        className="rounded-full border border-amber-300/60 px-3 py-1 text-sm text-amber-200 transition hover:bg-amber-300 hover:text-slate-900"
+                      >
+                        Editar
+                      </button>
+                    </div>
+                  )}
                 </article>
               ))}
               {products.length === 0 && (
-                <p className="text-sm text-slate-400">No hay productos. Crea el primero.</p>
+                <p className="text-sm text-slate-400">No hay productos. {isAdmin ? 'Crea el primero.' : 'Consulta más tarde.'}</p>
               )}
             </div>
           </div>

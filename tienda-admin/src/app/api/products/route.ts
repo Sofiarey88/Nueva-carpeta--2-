@@ -4,7 +4,8 @@ import { addProduct, getProducts, type ProductInput } from "@/lib/products";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-  return NextResponse.json(getProducts());
+  const items = await getProducts();
+  return NextResponse.json(items);
 }
 
 export async function POST(req: NextRequest) {
@@ -20,7 +21,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ message: "Price and stock must be numbers" }, { status: 400 });
     }
 
-    const newProduct = addProduct({
+    const newProduct = await addProduct({
       name: body.name,
       description: body.description,
       price,

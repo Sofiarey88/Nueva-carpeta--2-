@@ -11,7 +11,8 @@
   "dependencies": {
     "next": "16.1.1",
     "react": "19.2.3",
-    "react-dom": "19.2.3"
+    "react-dom": "19.2.3",
+    "mongodb": "^6"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
@@ -19,6 +20,7 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "eslint": "^9",
+    "dotenv": "^16",
     "eslint-config-next": "16.1.1",
     "tailwindcss": "^4",
     "typescript": "^5"

@@ -5,7 +5,7 @@ export const dynamic = "force-dynamic";
 
 export async function GET(_: NextRequest, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
-  const product = getProductById(id);
+  const product = await getProductById(id);
   if (!product) {
     return NextResponse.json({ message: "Not found" }, { status: 404 });
   }
@@ -22,7 +22,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ id: 
       return NextResponse.json({ message: "Price and stock must be numbers" }, { status: 400 });
     }
 
-    const updated = updateProduct(id, {
+    const updated = await updateProduct(id, {
       ...body,
       price: price ?? undefined,
       stock: stock ?? undefined,

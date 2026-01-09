@@ -67,8 +67,24 @@ export default function AdminLoginPage() {
           </button>
         </form>
 
+        <div className="rounded-2xl border border-white/10 bg-white/5 p-6 space-y-3">
+          <h2 className="text-sm font-semibold text-slate-200">Credenciales disponibles:</h2>
+          <div className="space-y-2 text-xs text-slate-400">
+            <div>
+              <p className="text-amber-300/80 font-semibold">Admin:</p>
+              <p className="text-slate-300">admin1234</p>
+              <p className="text-slate-500">(Editar, agregar y eliminar productos)</p>
+            </div>
+            <div className="border-t border-white/5 pt-2">
+              <p className="text-blue-300/80 font-semibold">Empleado:</p>
+              <p className="text-slate-300">emp1234</p>
+              <p className="text-slate-500">(Solo lectura)</p>
+            </div>
+          </div>
+        </div>
+
         <p className="text-center text-xs text-slate-400">
-          Clave predeterminada: admin123 (cámbiala con la variable de entorno ADMIN_PASSWORD).
+          Cambia las credenciales usando las variables de entorno ADMIN_PASSWORD y EMPLOYEE_PASSWORD.
         </p>
       </div>
     </div>
